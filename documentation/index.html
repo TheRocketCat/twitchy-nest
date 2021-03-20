@@ -1,0 +1,217 @@
+<!doctype html>
+<html class="no-js" lang="">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="x-ua-compatible" content="ie=edge">
+        <title>twitchy-nest documentation</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+
+        <link rel="icon" type="image/x-icon" href="./images/favicon.ico">
+	      <link rel="stylesheet" href="./styles/style.css">
+    </head>
+    <body>
+
+        <div class="navbar navbar-default navbar-fixed-top visible-xs">
+            <a href="./" class="navbar-brand">twitchy-nest documentation</a>
+            <button type="button" class="btn btn-default btn-menu ion-ios-menu" id="btn-menu"></button>
+        </div>
+
+        <div class="xs-menu menu" id="mobile-menu">
+                <div id="book-search-input" role="search"><input type="text" placeholder="Type to search"></div>            <compodoc-menu></compodoc-menu>
+        </div>
+
+        <div class="container-fluid main">
+           <div class="row main">
+               <div class="hidden-xs menu">
+                   <compodoc-menu mode="normal"></compodoc-menu>
+               </div>
+               <!-- START CONTENT -->
+               <div class="content getting-started">
+                   <div class="content-data">
+
+<h1 id="twitchy">Twitchy</h1>
+<p>The coolest chat bot there is for your Creator Coins FANS!!!</p>
+<h2 id="description">Description</h2>
+<p>It&#39;s the coolest, what other reason do i have to give you?
+Oh... maybe that you&#39;ll potentially increase your cult followers
+9000x, or that there is one feature to kick all the users at once,
+or that we even included a death ray, free of charge ??!?!</p>
+<h2 id="usage">Usage</h2>
+<h3 id="commands">Commands</h3>
+<p>Commands follow the structure of {command token}{command name} [...args]
+where {} means required, and [] are optional arguments.
+Double quotes will be noted when required.
+<strong>Example:</strong>
+Command: createAutoMsg &quot;{message}&quot; {update cycle in minutes}</p>
+<div><pre class="line-numbers"><code class="language-none">    !createAutoMsg &quot;i print every 10 minutes&quot; 10</code></pre></div><p>Anything with quotes, eg &quot;&quot;, are strings and must be written inside those. Everything
+else is numbers with different values, like minutes, coins, etc.</p>
+<p>Command: !coinPrice [coin symbol]</p>
+<div><pre class="line-numbers"><code class="language-none">    !coinPrice</code></pre></div><div><pre class="line-numbers"><code class="language-none">    !coinPrice MyCoin </code></pre></div><h1 id="contributing">Contributing</h1>
+<h2 id="conventions-ill-defeand-to-my-death">Conventions i&#39;ll defeand to my death</h2>
+<p>The best code is that which optimizes for productivity, readability,
+stability and speed.</p>
+<h2 id="ts-results">ts-results</h2>
+<p>To increase stability, and code production, we use ts-results; a
+library inspired by rusts results library.
+It is great to increase the readability and understanding of
+function signatures. We mainly use this instead of throwing errors
+at people.</p>
+<div><pre class="line-numbers"><code class="language-Javascript">//DONT
+function badFunc():number{
+    if(1+1 != 3){
+        throw new Error(&quot;im dumb&quot;)
+    }
+}
+//DO
+function goodFunc():Result&lt;number,Error&gt;{
+    if(1+1 == 2){
+        return Ok(2)
+    }else{
+        return Err(new Error(&quot;smarty pants&quot;))
+    }
+}
+</code></pre></div><p>Imagine, you didnt have to go read a giant function, or
+boring documentation, to make sure the dope of a JS function
+you about to use wont throw feacies (errors for monoglots) at 
+you like a lab monkey. Thats why you use ts-results, or gtfo.</p>
+<h3 id="deprecated---splitting-lines">DEPRECATED? - Splitting lines</h3>
+<h4 id="the-">The ,</h4>
+<p>When you split lines the split lines should start with , instead
+of end with , .
+example:</p>
+<div><pre class="line-numbers"><code class="language-Javascript">//not like this
+const o={
+    x:1,
+    y:2,
+    z:3
+}
+//like this
+const o={
+    x:1
+    ,y:2
+    ,z:3
+}</code></pre></div><p>It allows for a faster editing of those lines.
+Im dead serious about this convention. When splitting lines, split thously or i&#39;ll split your head.
+(PS: this is the haskell way, so at least i got the mathematicians on my lazy ass side)</p>
+<h4 id="deprecated---chaining-functions-about-">DEPRECATED? - Chaining functions (about ;)</h4>
+<p>TLDR; Indent, and end chain with ;
+example:</p>
+<div><pre class="line-numbers"><code class="language-Javascript">//DONT
+x()
+.y()
+.z()
+//DO
+x()
+    .y()
+    .z();</code></pre></div><p>Long, dont read:
+When chaining functions , to end the sequence, this is to avoid
+typescript from tripping over itself. Otherwise, referering back to
+the policy of PRSS (productivity, readability, stability, speed), we
+dont end lines with ; , because its not strictly needed, and saves us
+1 keystroke. In terms of optimization, it runs slightly faster with ;,
+but the typescript compiler handle that.</p>
+<h2 id="auto-formatting">Auto Formatting</h2>
+<p>We use prettifier</p>
+<h2 id="tests">Tests</h2>
+<h3 id="setup">Setup</h3>
+<h4 id="mocks">Mocks</h4>
+<h5 id="channel">channel</h5>
+<p>channels nammes must be lowercase and start with #.
+example:</p>
+<div><pre class="line-numbers"><code class="language-none">#iamacorrectlynamedchannel</code></pre></div><h3 id="expect">Expect</h3>
+<p>Should be written so that on unsuccesfull tests the error
+message is printed by jest.
+example:</p>
+<div><pre class="line-numbers"><code class="language-Javascript">//this
+const cmdRes:Result&lt;void,Error&gt; = function()
+expect(cmdRes).toBe(Ok.EMPTY)
+//prints
+/*
+    ErrImpl {
+      &quot;err&quot;: true,
+      &quot;ok&quot;: false,
+      &quot;val&quot;: [unauthorized error: user is not authorized],
+*/</code></pre></div><p>It prints like that on error because its comparing the whole structure,
+which then includes the error in val.</p>
+<p>Dont do this:</p>
+<div><pre class="line-numbers"><code class="language-none">const cmdRes:Result&lt;void,Error&gt; = function()
+expect(cmdRes.ok).toBe(true)</code></pre></div><p>it will only print that it expected true, but got false. Which
+isnt helpful to understand what error occured.</p>
+<h1 id="development">Development</h1>
+<h2 id="testing">Testing</h2>
+<p>We use the Jest framework, because its very handy and is suggested
+for NestJs.</p>
+<h3 id="helpful-resources">Helpful Resources</h3>
+<p><a href="https://github.com/jmcdo29/testing-nestjs">testing examples</a>
+<a href="https://github.com/golevelup/nestjs/tree/8b64d8303de9afb794df3fe50cdb557ab27e8c57/packages/testing">makes it easier to mock</a></p>
+<h3 id="running-tests">Running tests</h3>
+<div><pre class="line-numbers"><code class="language-sh">    npm test</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+                   
+
+
+
+
+                   </div><div class="search-results">
+    <div class="has-results">
+        <h1 class="search-results-title"><span class='search-results-count'></span> result-matching "<span class='search-query'></span>"</h1>
+        <ul class="search-results-list"></ul>
+    </div>
+    <div class="no-results">
+        <h1 class="search-results-title">No results matching "<span class='search-query'></span>"</h1>
+    </div>
+</div>
+</div>
+               <!-- END CONTENT -->
+           </div>
+       </div>
+
+       <script>
+            var COMPODOC_CURRENT_PAGE_DEPTH = 0;
+            var COMPODOC_CURRENT_PAGE_CONTEXT = 'getting-started';
+            var COMPODOC_CURRENT_PAGE_URL = 'index.html';
+            var MAX_SEARCH_RESULTS = 15;
+       </script>
+
+       <script src="./js/libs/custom-elements.min.js"></script>
+       <script src="./js/libs/lit-html.js"></script>
+       <!-- Required to polyfill modern browsers as code is ES5 for IE... -->
+       <script src="./js/libs/custom-elements-es5-adapter.js" charset="utf-8" defer></script>
+       <script src="./js/menu-wc.js" defer></script>
+
+       <script src="./js/libs/bootstrap-native.js"></script>
+
+       <script src="./js/libs/es6-shim.min.js"></script>
+       <script src="./js/libs/EventDispatcher.js"></script>
+       <script src="./js/libs/promise.min.js"></script>
+       <script src="./js/libs/zepto.min.js"></script>
+
+       <script src="./js/compodoc.js"></script>
+
+       <script src="./js/tabs.js"></script>
+       <script src="./js/menu.js"></script>
+       <script src="./js/libs/clipboard.min.js"></script>
+       <script src="./js/libs/prism.js"></script>
+       <script src="./js/sourceCode.js"></script>
+          <script src="./js/search/search.js"></script>
+          <script src="./js/search/lunr.min.js"></script>
+          <script src="./js/search/search-lunr.js"></script>
+          <script src="./js/search/search_index.js"></script>
+       <script src="./js/lazy-load-graphs.js"></script>
+
+
+    </body>
+</html>
