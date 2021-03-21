@@ -21,7 +21,6 @@ export class InfoCommandService {
 
 	async getInfoCmd(readInfoCommandDto: ReadInfoCommandDto) {
 		return this.InfoCommandModel.findOne(readInfoCommandDto).exec();
-		//return this.InfoCommandModel.findOne(readInfoCommandDto)
 	}
 
 	findAll() {
