@@ -1,9 +1,8 @@
 import { Userstate } from 'tmi.js';
-import { extractCommandArgs } from './shared/utilities/args';
 import { Result, Ok, Err } from 'ts-results';
 
+import { extractCommandArgs } from './shared/utilities/args';
 import { TwitchInfoCommand } from './info-command/info-command';
-import { IToString } from './shared/interfaces';
 
 export class CmdHandler {
 	constructor(private TIC: TwitchInfoCommand) {}
@@ -13,15 +12,14 @@ export class CmdHandler {
 		userstate: Userstate,
 		msg: string,
 		self: boolean,
-	): Promise<Result<IToString | string | void, Error>> {
+	): Promise<Result<any, Error>> {
 		//const command = msg.trim().split(" ")
-		const commandName = msg.trim().split(' ')[0];
+		const cmd = msg.trim().split(' ')[0];
 
-		//TODO handle command results
-		let cmdResult: Result<IToString | string | void, Error>;
+		let cmdResult: Result<any, Error>;
 		const args = extractCommandArgs(msg).expect('parsing args');
 		//standard commands
-		switch (commandName) {
+		switch (cmd) {
 			/*
 			case "!createAutoMsg":
 				cmdResult=await createNewAutoMsgHandler(channel,userstate,msg);
@@ -49,16 +47,18 @@ export class CmdHandler {
 				//cmdResult=await deleteInfoCommandHandler(channel,userstate, msg)
 				break;
 		}
+
+
 		//check custom commands
-		/*
 		if(cmdResult==undefined){
-			cmdResult=await getInfoCommandHandler(channel,msg)
+			cmdResult=await this.TIC.get(channel,cmd)
+
+			/*
 			if(cmdResult.err){
-				client.whisper(userstate.username,"no such command")
 				return Err(new Error("no such command"))
 			}
+			*/
 		}
-		*/
 		return cmdResult;
 	}
 }
