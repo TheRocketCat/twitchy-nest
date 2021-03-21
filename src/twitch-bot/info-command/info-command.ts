@@ -1,13 +1,12 @@
 import { InfoCommandService } from '../../info-command/info-command.service';
 import { extractCommandArgs } from '../shared/utilities/args';
 import { CreateInfoCommandDto } from '../../info-command/dto/create-info-command.dto';
+import {InfoCommandDoc} from "../../info-command/schemas/info-command.schema"
 import { ReadInfoCommandDto } from '../../info-command/dto/read-info-command.dto';
 import { Userstate } from 'tmi.js';
 import { Result, Ok, Err } from 'ts-results';
 
-import { TwitchOwner, isOwner, UnauthorizedError } from '../auth';
-
-import { validate, ValidationError } from 'class-validator';
+import { TwitchOwner, UnauthorizedError } from '../auth';
 
 export class TwitchInfoCommand {
 	constructor(private ICS: InfoCommandService) {}
@@ -20,11 +19,8 @@ export class TwitchInfoCommand {
 	async create(
 		channel: string,
 		userstate: Userstate,
-		...[cmd, info]: any[]
+		[cmd, info]: any[]
 	): Promise<Result<void, Error>> {
-		if (isOwner(channel, userstate) == false) {
-			return Err(new UnauthorizedError());
-		}
 		try {
 			const dto = (
 				await CreateInfoCommandDto.createAndValidate(channel, cmd, info)
@@ -37,8 +33,20 @@ export class TwitchInfoCommand {
 		}
 	}
 
-	async get(channel: string, cmd: string) {
-		return this.ICS.getInfoCmd({ channel, cmd });
+	async get(channel: string, cmd: string):Promise<Result<InfoCommandDoc,Error>> {
+		try{
+			const dto=(await ReadInfoCommandDto
+				.createAndValidate(channel,cmd))
+				.unwrap();
+			dto.cmd=cmd.substring(1) // remove command symbol
+			const doc=await this.ICS.getInfoCmd(dto);
+			if(doc == null){
+				return Err(new Error("no such command"))
+			}else if(doc.errors){
+				return Err(doc.errors)
+			}
+			return Ok(doc)
+		}catch(e){ return Err(e)}
 	}
 }
 
@@ -86,31 +94,3 @@ async function x(){
 	console.log(val.cmd)
 }
 */
-
-class TwitchTest {
-	@TwitchOwner()
-	test(
-		channel: string,
-		userstate: Userstate,
-		x: string,
-		y: string,
-	): Result<string, Error> {
-		console.log('channel:', channel);
-		console.log('userstate:', userstate);
-		console.log('x:', x);
-		console.log('y:', y);
-		return Ok('success');
-	}
-
-	@TwitchOwner()
-	x(channel: string, userstate: Userstate): Result<void, Error> {
-		return Ok.EMPTY;
-	}
-}
-
-function t() {
-	const tIC = new TwitchTest();
-	const res = tIC.x('#x', { username: 'x' });
-	console.log('x:', res);
-}
-t();
