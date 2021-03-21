@@ -1,6 +1,7 @@
 import * as dotenv from 'dotenv';
 import * as tmi from 'tmi.js';
 import { NestFactory } from '@nestjs/core';
+import {Result,Ok} from "ts-results"
 import {
 	FastifyAdapter,
 	NestFastifyApplication,
@@ -69,7 +70,7 @@ async function bootstrap() {
 	});
 	twitchClient.on(
 		'message',
-		function (
+		async function (
 			channel: string,
 			userstate: tmi.Userstate,
 			msg: string,
@@ -80,13 +81,26 @@ async function bootstrap() {
 			else if (userstate.username == undefined) {
 				return;
 			}
-			const cmdResult = cmdHandler.executeCmd(channel, userstate, msg, self);
-			//(twitchClient.say(channel,makeResponseString(cmdResult))
+			const cmdResult = await cmdHandler.executeCmd(channel, userstate, msg, self);
+			writeResultMessage(twitchClient,channel,cmdResult)
 		},
 	);
 	await twitchClient.connect();
 }
 bootstrap();
+
+function writeResultMessage(client:tmi.Client,channel:string,resMsg:Result<any,Error>):void
+{
+	if(resMsg.err == true){
+		client.say(channel,"command failed")
+		return
+	}else if(resMsg == Ok.EMPTY){
+		client.say(channel,"success")
+	}else{
+		//TODO idk how well this work
+		client.say(channel,String(resMsg.val))
+	}
+}
 
 /*
 const client=new tmi.Client()
