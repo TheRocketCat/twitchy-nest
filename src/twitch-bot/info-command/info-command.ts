@@ -1,8 +1,11 @@
 import { InfoCommandService } from '../../info-command/info-command.service';
-import { CreateInfoCommandDto } from '../../info-command/dto/create-info-command.dto';
+import { 
+	CreateInfoCommandDto,
+	ReadInfoCommandDto,
+	UpdateInfoCommandDto,
+	DeleteInfoCommandDto,
+} from '../../info-command/dto';
 import {InfoCommandDoc} from "../../info-command/schemas/info-command.schema"
-import { ReadInfoCommandDto } from '../../info-command/dto/read-info-command.dto';
-import { UpdateInfoCommandDto } from '../../info-command/dto/update-info-command.dto';
 import { Userstate } from 'tmi.js';
 import { Result, Ok, Err } from 'ts-results';
 
@@ -66,5 +69,24 @@ export class TwitchInfoCommand {
 			}
 			return Ok.EMPTY
 		}catch(e){ return Err(e) }
+	}
+
+	@TwitchOwner()
+	async delete(channel:string,userstate:Userstate,[cmd]:any[])
+	:Promise<Result<void,Error>>
+	{
+		try{
+			const dto=(await DeleteInfoCommandDto
+				.createAndValidate(channel,cmd))
+				.unwrap();
+
+			const res=await this.ICS.delete(dto)
+			if(!res.ok){
+				return Err(new SystemFailureError("mongodb remove info command"))
+			}else if(res.deletedCount==0){
+				return Err(new UserError("no such command"))
+			}
+			return Ok.EMPTY
+		}catch(e){return Err(e)}
 	}
 }

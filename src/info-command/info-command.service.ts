@@ -1,7 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateInfoCommandDto } from './dto/create-info-command.dto';
-import { UpdateInfoCommandDto } from './dto/update-info-command.dto';
-import { ReadInfoCommandDto } from './dto/read-info-command.dto';
+import { 
+	CreateInfoCommandDto
+	,ReadInfoCommandDto 
+	,UpdateInfoCommandDto 
+	,DeleteInfoCommandDto 
+} from './dto';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { InfoCommand, InfoCommandDoc } from './schemas/info-command.schema';
@@ -31,11 +34,7 @@ export class InfoCommandService {
 			).exec()
 	}
 
-	update(id: number, updateInfoCommandDto: UpdateInfoCommandDto) {
-		return `This action updates a #${id} infoCommand`;
-	}
-
-	remove(id: number) {
-		return `This action removes a #${id} infoCommand`;
+	async delete(dto:DeleteInfoCommandDto) {
+		return this.InfoCommandModel.deleteOne(dto)
 	}
 }

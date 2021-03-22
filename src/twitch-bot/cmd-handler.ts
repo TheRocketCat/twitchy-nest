@@ -53,7 +53,7 @@ export class CmdHandler {
 				cmdResult=await this.TIC.updateInfo(channel,userstate, args)
 				break;
 			case TwitchInfoCommand.deleteCmd:
-				//cmdResult=await deleteInfoCommandHandler(channel,userstate, msg)
+				cmdResult=await this.TIC.delete(channel,userstate,args)
 				break;
 		}
 

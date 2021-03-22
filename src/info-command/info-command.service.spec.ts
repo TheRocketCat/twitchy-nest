@@ -60,6 +60,7 @@ describe('InfoCommandService', () => {
 						create: jest.fn(),
 						findOne: jest.fn(),
 						updateOne:jest.fn(),
+						deleteOne:jest.fn(),
 					},
 				},
 			],
@@ -110,4 +111,11 @@ describe('InfoCommandService', () => {
 		expect(res.ok).toBeTruthy()
 		expect(res.nModified).toBe(1)
 	});
+
+	it("should remove info cmd",async()=>{
+		jest.spyOn(model, 'deleteOne').mockResolvedValueOnce({ok:1,deletedCount:1,n:1});
+		const res = await service.delete({channel:OWNED_CHANNEL,cmd:"myCmd"});
+		expect(res.ok).toBeTruthy()
+		expect(res.deletedCount).toBe(1)
+	})
 });

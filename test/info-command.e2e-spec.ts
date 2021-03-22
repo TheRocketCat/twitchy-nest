@@ -8,6 +8,7 @@ import {
 import { InfoCommandModule } from '../src/info-command/info-command.module';
 import { TwitchInfoCommand } from '../src/twitch-bot/info-command/info-command';
 import { CmdHandler,standardCmdHandlerSetup } from '../src/twitch-bot/cmd-handler';
+import {UserError} from "../src/shared/error"
 import {UnauthorizedError} from "../src/twitch-bot/auth"
 import {rootMongooseTestModule,closeInMongodConnection} from "../src/shared/testing/mongo-in-memory-db.module"
 
@@ -38,6 +39,10 @@ describe('TwitchBot InfoCommand', () => {
 		await app.init();
 
 		cmdHandler = standardCmdHandlerSetup(app)
+	});
+	afterAll(async () => {
+		await closeInMongodConnection()
+		await app.close();
 	});
 
 	describe(TwitchInfoCommand.createCmd,()=>{
@@ -103,9 +108,46 @@ describe('TwitchBot InfoCommand', () => {
 		})
 	})
 
+	describe(TwitchInfoCommand.deleteCmd,()=>{
+		it("should not delete info cmd",async()=>{
+			let msg = `!${TwitchInfoCommand.deleteCmd} ${NEW_INFO_CMD}`;
+			let res = await cmdHandler.executeCmd(
+				OWNED_CHANNEL,
+				{username:"hackerdude"},
+				msg,
+				false,
+			);
+			expect(res).toEqual(Err(new UnauthorizedError()))
 
-	afterAll(async () => {
-		await closeInMongodConnection()
-		await app.close();
-	});
+			msg = `!${NEW_INFO_CMD}`
+			res = await cmdHandler.executeCmd(
+				OWNED_CHANNEL,
+				USERSTATE,
+				msg,
+				false,
+			);
+
+			expect(res).toBeInstanceOf(OkImpl)
+		})
+		it("should delete info cmd",async()=>{
+			let msg = `!${TwitchInfoCommand.deleteCmd} ${NEW_INFO_CMD}`;
+			let res = await cmdHandler.executeCmd(
+				OWNED_CHANNEL,
+				USERSTATE,
+				msg,
+				false,
+			);
+			expect(res).toEqual(Ok.EMPTY)
+
+			msg = `!${NEW_INFO_CMD}`
+			res = await cmdHandler.executeCmd(
+				OWNED_CHANNEL,
+				USERSTATE,
+				msg,
+				false,
+			);
+
+			expect(res).toEqual(Err(new UserError("no such command")))
+		})
+	})
 });
