@@ -14,17 +14,21 @@ export class InfoCommandService {
 	) {}
 
 	async create(
-		createInfoCommandDto: CreateInfoCommandDto,
+		dto: CreateInfoCommandDto,
 	): Promise<InfoCommandDoc> {
-		return this.InfoCommandModel.create(createInfoCommandDto);
+		return this.InfoCommandModel.create(dto);
 	}
 
-	async getInfoCmd(readInfoCommandDto: ReadInfoCommandDto) {
-		return this.InfoCommandModel.findOne(readInfoCommandDto).exec();
+	async getInfoCmd(dto: ReadInfoCommandDto) {
+		return this.InfoCommandModel.findOne(dto).exec();
 	}
 
-	findAll() {
-		return `This action returns all infoCommand`;
+	async updateInfo(dto:UpdateInfoCommandDto){
+		return this.InfoCommandModel
+			.updateOne(
+				{channel:dto.channel,cmd:dto.cmd}
+				,{ $set: {"info": dto.info } }
+			).exec()
 	}
 
 	update(id: number, updateInfoCommandDto: UpdateInfoCommandDto) {

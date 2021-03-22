@@ -7,7 +7,11 @@ import {
 	InfoCommandDoc,
 	//,InfoCommandModel
 } from './schemas/info-command.schema';
-import { Model, Query } from 'mongoose';
+import { 
+	Model,
+	Query,
+	QueryWithHelpers
+} from 'mongoose';
 import { createMock } from '@golevelup/ts-jest';
 
 const USERSTATE = {
@@ -23,12 +27,12 @@ interface IInfoCommand {
 	info: string;
 }
 
-const mockInfoCommand = (
+const mockInfoCommand = ({
 	id = 'a uuid',
 	channel = OWNED_CHANNEL,
 	cmd = 'myCmd',
 	info = 'this info will print',
-): IInfoCommand => ({ id, channel, cmd, info });
+}): IInfoCommand => ({ id, channel, cmd, info });
 
 const mockInfoCommandDoc = (
 	mock?: Partial<IInfoCommand>,
@@ -42,6 +46,7 @@ const mockInfoCommandDoc = (
 describe('InfoCommandService', () => {
 	let service: InfoCommandService;
 	let model: Model<InfoCommandDoc>;
+	const CMD="myCmd"
 
 	beforeEach(async () => {
 		const module: TestingModule = await Test.createTestingModule({
@@ -50,10 +55,11 @@ describe('InfoCommandService', () => {
 				{
 					provide: getModelToken(InfoCommand.name),
 					useValue: {
-						new: jest.fn().mockResolvedValue(mockInfoCommand()),
-						constructor: jest.fn().mockResolvedValue(mockInfoCommand()),
+						new: jest.fn().mockResolvedValue(mockInfoCommand({})),
+						constructor: jest.fn().mockResolvedValue(mockInfoCommand({})),
 						create: jest.fn(),
 						findOne: jest.fn(),
+						updateOne:jest.fn(),
 					},
 				},
 			],
@@ -71,27 +77,37 @@ describe('InfoCommandService', () => {
 	});
 
 	it('should create info cmd', async () => {
-		const cmd = 'myCmd';
 		const info = 'this will print';
 
 		jest
 			.spyOn(model, 'create')
-			.mockImplementationOnce(() => Promise.resolve(mockInfoCommand()));
+			.mockImplementationOnce(() => Promise.resolve(mockInfoCommand({})));
 
-		const res = await service.create({ channel: OWNED_CHANNEL, cmd, info });
-		expect(res).toEqual(mockInfoCommand());
+		const res = await service.create({ channel: OWNED_CHANNEL, cmd:CMD, info });
+		expect(res).toEqual(mockInfoCommand({}));
 	});
 
-	it('should get cmd', async () => {
-		const cmd = 'myCmd';
-
+	it('should get CMD', async () => {
 		jest.spyOn(model, 'findOne').mockReturnValueOnce(
 			createMock<Query<InfoCommandDoc, InfoCommandDoc>>({
 				exec: jest.fn().mockResolvedValueOnce(mockInfoCommandDoc()),
 			}),
 		);
 
-		const res = await service.getInfoCmd({ channel: OWNED_CHANNEL, cmd });
+		const res = await service.getInfoCmd({ channel: OWNED_CHANNEL, cmd:CMD });
 		expect(res).toEqual(mockInfoCommandDoc());
+	});
+
+	it('should update info', async () => {
+		const newInfo="this is the new info"
+		const returned=mockInfoCommand({info:newInfo})
+		jest.spyOn(model, 'updateOne').mockReturnValueOnce(
+		  createMock<Query<{ok:number,n:number,nModified:number}, InfoCommandDoc>>({
+			exec: jest.fn().mockResolvedValueOnce({ok:1,n:1,nModified:1}),
+		  }),
+		);
+		const res = await service.updateInfo({channel:OWNED_CHANNEL,cmd:"myCmd",info:newInfo});
+		expect(res.ok).toBeTruthy()
+		expect(res.nModified).toBe(1)
 	});
 });
