@@ -33,7 +33,7 @@ async function bootstrap() {
 	const config = new DocumentBuilder()
 		.setTitle('Twitchy Rally Bot')
 		.setDescription('a twitch bot for Rally Creators')
-		.setVersion('0.0.1')
+		.setVersion('0.0.26')
 		.build();
 
 	const document = SwaggerModule.createDocument(app, config);
