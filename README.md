@@ -27,7 +27,30 @@ Command: !coinPrice [coin symbol]
     !coinPrice MyCoin 
 ```
 
-# Contributing
+# Development & Contributing
+## Testing
+We use the Jest framework, because its very handy and is suggested
+for NestJs.
+### Helpful Resources
+[testing examples](https://github.com/jmcdo29/testing-nestjs)
+[makes it easier to mock](https://github.com/golevelup/nestjs/tree/8b64d8303de9afb794df3fe50cdb557ab27e8c57/packages/testing)
+[unit testing mongodb](https://dev.to/webeleon/unit-testing-nestjs-with-mongo-in-memory-54gd)
+### Running tests
+```sh
+    npm test
+```
+## Return Types
+Twitch Commands return the Result type. Because throwing errors
+doesnt notify the collaborators of the potential issues that can
+occour.
+
+When no data is needed by the caller we return Result<void,Error>
+This is done with `return Ok.EMPTY`.
+When data is expected return Result< data ,Error>
+
+## Authorization
+
+
 ## Conventions i'll defeand to my death
 The best code is that which optimizes for productivity, readability,
 stability and speed.
@@ -143,17 +166,4 @@ expect(cmdRes.ok).toBe(true)
 ```
 it will only print that it expected true, but got false. Which
 isnt helpful to understand what error occured.
-
-# Development
-## Testing
-We use the Jest framework, because its very handy and is suggested
-for NestJs.
-### Helpful Resources
-[testing examples](https://github.com/jmcdo29/testing-nestjs)
-[makes it easier to mock](https://github.com/golevelup/nestjs/tree/8b64d8303de9afb794df3fe50cdb557ab27e8c57/packages/testing)
-[unit testing mongodb](https://dev.to/webeleon/unit-testing-nestjs-with-mongo-in-memory-54gd)
-### Running tests
-```sh
-    npm test
-```
 
