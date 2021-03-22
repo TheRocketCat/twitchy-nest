@@ -12,7 +12,7 @@ import {UserError} from "../src/shared/error"
 import {UnauthorizedError} from "../src/twitch-bot/auth"
 import {rootMongooseTestModule,closeInMongodConnection} from "../src/shared/testing/mongo-in-memory-db.module"
 
-describe('TwitchBot InfoCommand', () => {
+describe('TwitchBot InfoCommand [e2e]', () => {
 	const USERSTATE = {
 		username: 'username',
 	};
