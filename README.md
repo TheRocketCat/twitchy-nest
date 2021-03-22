@@ -151,6 +151,7 @@ for NestJs.
 ### Helpful Resources
 [testing examples](https://github.com/jmcdo29/testing-nestjs)
 [makes it easier to mock](https://github.com/golevelup/nestjs/tree/8b64d8303de9afb794df3fe50cdb557ab27e8c57/packages/testing)
+[unit testing mongodb](https://dev.to/webeleon/unit-testing-nestjs-with-mongo-in-memory-54gd)
 ### Running tests
 ```sh
     npm test
