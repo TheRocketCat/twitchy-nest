@@ -1,8 +1,12 @@
 import { Userstate } from 'tmi.js';
+import { INestApplication } from '@nestjs/common';
 import { Result, Ok, Err } from 'ts-results';
 
 import { extractCommandArgs } from './shared/utilities/args';
 import { TwitchInfoCommand } from './info-command/info-command';
+import {UserError} from "../shared/error"
+
+import {InfoCommandService} from "../info-command/info-command.service"
 
 export class CmdHandler {
 	constructor(private TIC: TwitchInfoCommand) {}
@@ -13,11 +17,16 @@ export class CmdHandler {
 		msg: string,
 		self: boolean,
 	): Promise<Result<any, Error>> {
-		//const command = msg.trim().split(" ")
-		const cmd = msg.trim().split(' ')[0];
+		//remove extra whitesplace, get first cmd and remove cmd symbol
+		const cmd = msg.trim().split(' ')[0].substring(1);
 
 		let cmdResult: Result<any, Error>;
-		const args = extractCommandArgs(msg).expect('parsing args');
+		let args:any[];
+		try{
+			args = extractCommandArgs(msg).expect('parsing args');
+		}catch(e){
+			return Err(new UserError("double check your cmd arguments"))
+		}
 		//standard commands
 		switch (cmd) {
 			/*
@@ -37,13 +46,13 @@ export class CmdHandler {
 				cmdResult=await getVolumeHandler(msg)
 			break
 			*/
-			case '!createInfoCmd':
+			case TwitchInfoCommand.createCmd:
 				cmdResult = await this.TIC.create(channel, userstate, args);
 				break;
-			case '!updateInfoCmd':
-				//cmdResult=await updateInfoCommandHandler(channel,userstate, msg)
+			case TwitchInfoCommand.updateInfoCmd:
+				cmdResult=await this.TIC.updateInfo(channel,userstate, args)
 				break;
-			case '!deleteInfoCmd':
+			case TwitchInfoCommand.deleteCmd:
 				//cmdResult=await deleteInfoCommandHandler(channel,userstate, msg)
 				break;
 		}
@@ -63,4 +72,7 @@ export class CmdHandler {
 	}
 }
 
-//function standardSetup() {}
+export function standardCmdHandlerSetup(app:INestApplication):CmdHandler {
+	const infoCmdService = app.get(InfoCommandService);
+	return new CmdHandler(new TwitchInfoCommand(infoCmdService));
+}
