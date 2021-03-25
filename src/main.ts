@@ -9,7 +9,7 @@ import {
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 
-import { CmdHandler } from './twitch-bot/cmd-handler';
+import { CmdHandler, standardCmdHandlerSetup } from './twitch-bot/cmd-handler';
 import { InfoCommandService } from './info-command/info-command.service';
 import { InfoCommandController } from './info-command/info-command.controller';
 import { TwitchInfoCommand } from './twitch-bot/info-command/info-command';
@@ -24,6 +24,7 @@ async function bootstrap() {
 		new FastifyAdapter(),
 	);
 
+	/*
 	app.useGlobalPipes(
 		new ValidationPipe({
 			//disableErrorMessages: true,
@@ -38,36 +39,34 @@ async function bootstrap() {
 
 	const document = SwaggerModule.createDocument(app, config);
 	SwaggerModule.setup('api', app, document);
+	*/
 
-	await app.listen(3000);
+	//await app.listen(3000);
 
-	const infoCmdService = app.get(InfoCommandService);
+	const cmdHandler = standardCmdHandlerSetup(app)
 
-	const cmdHandler = new CmdHandler(
-		//twitchInfoCmd
-		new TwitchInfoCommand(infoCmdService),
-	);
-	//cmdHandler.executeCmd("x",{},"y",true)
 
 	//TODO check so tokens dont have OAUTH at beginning ?
 	const opts = {
 		options: {
 			//clientId:"zmsxkjz11ag8a7mq7hdfg3gjg2vi6d"
+			debug:true,messagesLogLevel:"info"
 		},
 		connection: {
 			secure: true,
 		},
 		identity: {
-			username: 'darockecat',
+			username: 'DaRockeCat',
 			password: process.env.OAUTH,
 		},
 		channels: ['darockecat'],
 	};
 
 	const twitchClient = new tmi.Client(opts);
-	twitchClient.once('connected', function (adr, port) {
-		console.log('twitch client running');
+	twitchClient.on('connected', function(){
+		console.log("Twitchy runing")
 	});
+
 	twitchClient.on(
 		'message',
 		async function (
@@ -81,7 +80,12 @@ async function bootstrap() {
 			else if (userstate.username == undefined) {
 				return;
 			}
-			const cmdResult = await cmdHandler.executeCmd(channel, userstate, msg, self);
+			const cmdResult = await cmdHandler.executeCmd(
+				channel,
+				userstate,
+				msg,
+				self
+			);
 			writeResultMessage(twitchClient,channel,cmdResult)
 		},
 	);
