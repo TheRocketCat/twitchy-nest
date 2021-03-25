@@ -6,6 +6,16 @@ Oh... maybe that you'll potentially increase your cult followers
 9000x, or that there is one feature to kick all the users at once,
 or that we even included a death ray, free of charge ??!?!
 
+## Starting
+First you need a file called .env looking like this
+```sh
+OAUTH="my api key"
+```
+then run
+```sh
+	npm install
+	npm start
+```
 ## Usage
 ### Commands
 Commands follow the structure of {command token}{command name} [...args]
