@@ -15,6 +15,7 @@ import { UpdateInfoCommandDto } from './dto/update-info-command.dto';
 export class InfoCommandController {
 	constructor(private readonly infoCommandService: InfoCommandService) {}
 
+	/*
 	@Post()
 	create(@Body() createInfoCommandDto: CreateInfoCommandDto) {
 		console.log('executed');
@@ -38,4 +39,5 @@ export class InfoCommandController {
 	remove(@Param('id') id: string) {
 		return this.infoCommandService.remove(+id);
 	}
+	*/
 }
