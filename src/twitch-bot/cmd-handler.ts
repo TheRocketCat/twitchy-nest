@@ -4,12 +4,16 @@ import { Result, Ok, Err } from 'ts-results';
 
 import { extractCommandArgs } from './shared/utilities/args';
 import { TwitchInfoCommand } from './info-command/info-command';
+import { TwitchRallyCommand } from "./rally/commands";
 import {UserError} from "../shared/error"
 
 import {InfoCommandService} from "../info-command/info-command.service"
 
 export class CmdHandler {
-	constructor(private TIC: TwitchInfoCommand) {}
+	constructor(
+		private infoCommand: TwitchInfoCommand,
+		private rallyCommand: TwitchRallyCommand
+	) {}
 
 	async executeCmd(
 		channel: string,
@@ -46,21 +50,26 @@ export class CmdHandler {
 				cmdResult=await getVolumeHandler(msg)
 			break
 			*/
+		   //Rally
+		   case TwitchRallyCommand.getCoinCountCmd:
+				cmdResult=await this.rallyCommand.getCoinCount(args)
+				break
+
+			//InfoCommand 
 			case TwitchInfoCommand.createCmd:
-				cmdResult = await this.TIC.create(channel, userstate, args);
+				cmdResult = await this.infoCommand.create(channel, userstate, args);
 				break;
 			case TwitchInfoCommand.updateInfoCmd:
-				cmdResult=await this.TIC.updateInfo(channel,userstate, args)
+				cmdResult=await this.infoCommand.updateInfo(channel,userstate, args)
 				break;
 			case TwitchInfoCommand.deleteCmd:
-				cmdResult=await this.TIC.delete(channel,userstate,args)
+				cmdResult=await this.infoCommand.delete(channel,userstate,args)
 				break;
 		}
 
-
 		//check custom commands
 		if(cmdResult==undefined){
-			cmdResult=await this.TIC.get(channel,cmd)
+			cmdResult=await this.infoCommand.get(channel,cmd)
 
 			/*
 			if(cmdResult.err){
@@ -74,5 +83,8 @@ export class CmdHandler {
 
 export function standardCmdHandlerSetup(app:INestApplication):CmdHandler {
 	const infoCmdService = app.get(InfoCommandService);
-	return new CmdHandler(new TwitchInfoCommand(infoCmdService));
+	return new CmdHandler(
+		new TwitchInfoCommand(infoCmdService),
+		new TwitchRallyCommand()
+	);
 }
