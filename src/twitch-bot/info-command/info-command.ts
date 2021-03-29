@@ -10,6 +10,7 @@ import { Userstate } from 'tmi.js';
 import { Result, Ok, Err } from 'ts-results';
 
 import { TwitchOwner, UnauthorizedError } from '../auth';
+import { TwitchCmd } from "../cmd-decorator"
 import {UserError,SystemFailureError} from "../../shared/error"
 
 export class TwitchInfoCommand {
@@ -22,6 +23,7 @@ export class TwitchInfoCommand {
 	constructor(private ICS: InfoCommandService){}
 
 	@TwitchOwner()
+	@TwitchCmd(TwitchInfoCommand.createCmd)
 	async create(
 		channel: string,
 		userstate: Userstate,
@@ -39,7 +41,7 @@ export class TwitchInfoCommand {
 		}
 	}
 
-	async get(channel: string, cmd: string):Promise<Result<InfoCommandDoc,Error>> {
+	async get(channel: string, cmd: string):Promise<Result<string,Error>> {
 		try{
 			const dto=(await ReadInfoCommandDto
 				.createAndValidate(channel,cmd))
@@ -50,7 +52,7 @@ export class TwitchInfoCommand {
 			}else if(doc.errors){
 				return Err(doc.errors)
 			}
-			return Ok(doc)
+			return Ok(doc.info)
 		}catch(e){ return Err(e)}
 	}
 

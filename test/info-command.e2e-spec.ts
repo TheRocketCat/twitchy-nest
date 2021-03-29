@@ -11,13 +11,15 @@ import { CmdHandler,standardCmdHandlerSetup } from '../src/twitch-bot/cmd-handle
 import {UserError} from "../src/shared/error"
 import {UnauthorizedError} from "../src/twitch-bot/auth"
 import {rootMongooseTestModule,closeInMongodConnection} from "../src/shared/testing/mongo-in-memory-db.module"
+import {
+	mockCmdParams,
+	NOT_OWNER_USERSTATE,
+	USERSTATE,
+	OWNED_CHANNEL,
+	NOT_OWNED_CHANNEL
+} from "./utilities"
 
 describe('TwitchBot InfoCommand [e2e]', () => {
-	const USERSTATE = {
-		username: 'username',
-	};
-	const OWNED_CHANNEL = '#' + USERSTATE.username;
-	const NOT_OWNED_CHANNEL = '#notownedchannel';
 	const NEW_INFO_CMD="newCmd"
 	const INFO_PROCESSED="this information will print"
 	const INFO_UNPROCESSED = '"' + INFO_PROCESSED + '"'
@@ -47,6 +49,7 @@ describe('TwitchBot InfoCommand [e2e]', () => {
 
 	describe(TwitchInfoCommand.createCmd,()=>{
 		it('should create new info command', async () => {
+			/*
 			const msg = `!${TwitchInfoCommand.createCmd} ${NEW_INFO_CMD} ${INFO_UNPROCESSED}`;
 			const res = await cmdHandler.executeCmd(
 				OWNED_CHANNEL,
@@ -54,23 +57,27 @@ describe('TwitchBot InfoCommand [e2e]', () => {
 				msg,
 				false,
 			);
+			*/
+
+			const res = await cmdHandler.cmdSwitch(...mockCmdParams(
+					[TwitchInfoCommand.createCmd,NEW_INFO_CMD,INFO_UNPROCESSED]
+					,{}
+				));
 
 			expect(res).toBe(Ok.EMPTY);
 		});
 		it('should only create on your channel', async () => {
-			const msg = `!${TwitchInfoCommand.createCmd} ${NEW_INFO_CMD} ${INFO_UNPROCESSED}`;
-			const res = await cmdHandler.executeCmd(
-				NOT_OWNED_CHANNEL,
-				USERSTATE,
-				msg,
-				false,
-			);
+			const res = await cmdHandler.cmdSwitch(...mockCmdParams(
+					[TwitchInfoCommand.createCmd,NEW_INFO_CMD,INFO_UNPROCESSED]
+					,{userstate:NOT_OWNER_USERSTATE}
+				));
 
 			expect(res).toEqual(Err(new UnauthorizedError()))
 		});
 	})
 	describe("get custom info commands",()=>{
 		it("should get recently created info cmd info",async()=>{
+			/*
 			const msg = `!${NEW_INFO_CMD}`;
 			const res = await cmdHandler.executeCmd(
 				OWNED_CHANNEL,
@@ -78,8 +85,11 @@ describe('TwitchBot InfoCommand [e2e]', () => {
 				msg,
 				false,
 			);
-			expect(res).toBeInstanceOf(OkImpl)
-			expect(res.unwrap().info).toEqual(INFO_PROCESSED)
+			*/
+			const res = await cmdHandler.cmdSwitch(...mockCmdParams(
+					[`${NEW_INFO_CMD}`] ,{}
+				));
+			expect(res.unwrap()).toEqual(INFO_PROCESSED)
 		})
 	})
 
@@ -103,8 +113,7 @@ describe('TwitchBot InfoCommand [e2e]', () => {
 				msg,
 				false,
 			);
-			expect(res).toBeInstanceOf(OkImpl)
-			expect(res.unwrap().info).toEqual(newInfoProcessed)
+			expect(res.unwrap()).toEqual(newInfoProcessed)
 		})
 	})
 
