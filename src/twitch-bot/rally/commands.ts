@@ -3,55 +3,87 @@ import {
     ,Option ,Some ,None
 } from "ts-results"
 import {UserError} from "../../shared/error"
-import {fetchJson} from "../../shared/http"
+import {fetchJson,fetchJsonProperty} from "../../shared/http"
+import {CreatorCoinPrice,Balance} from "./types"
+import {TwitchCmd} from "../cmd-decorator"
+import {Userstate} from "tmi.js"
 
 const RALLY_API="https://api.rally.io/v1"
 
-
 export class TwitchRallyCommand{
-	static readonly getCoinCountCmd="coinCount"
 
-	async getCoinCount([coin]:string[])
+	static readonly getCoinCountCmd="coinCount"
+	static readonly getCreatorCoinTransactionsCmd="creatorTransactions"
+	static readonly getUserBalanceCmd="userBalance"
+	static readonly getCoinPrice="coinPrice"
+
+	@TwitchCmd(TwitchRallyCommand.getCoinCountCmd)
+	async getCoinCount(channel:string,us:Userstate,[coin]:string[])
 	:Promise<Result<string,Error>>{
 		if(coin == undefined){
 			return Err(new UserError("no coin symbol given"))
 		}
 		try{
-			const json=(
-				await fetchJson(
+			const totalCoins=(
+				await fetchJsonProperty(
 					`${RALLY_API}/creator_coins/${coin}/summary`
+					,"totalCoins"
 				)
 			).expect("get coin count");
-
-			if(json.totalCoins == undefined){
-				return Err(new Error("api is not working correctly"))
-			}
-			//const nmbr=<number>Joi.attempt(json.totalCoins,Joi.number().required())
-			return Ok(String(json.totalCoins))
+			return Ok(String(totalCoins))
 		}catch(e){
 			return Err(e)
 		}
 	}
-	/*
-	async getCoinPrice(msg:string)
+
+	@TwitchCmd(TwitchRallyCommand.getCreatorCoinTransactionsCmd)
+	async getCoinTransactionVolume(channel:string,us:Userstate, [coin]:string[])
+	:Promise<Result<string,Error>>
+	{
+		if(coin == undefined){
+			return Err(new UserError("no coin symbol given"))
+		}
+		try{
+			//TODO suppoer other idType - check docs
+			const totalTransaction=(await fetchJsonProperty(
+				`${RALLY_API}/creator_coins/${coin}/summary`,
+				"totalTransaction"
+			)).expect("get coin transaction volume");
+
+			return Ok(String(totalTransaction))
+		}catch(e){
+			return Err(e)
+		}
+	}
+
+	@TwitchCmd(TwitchRallyCommand.getCoinPrice)
+	async getCoinPrice(channel:string,us:Userstate,[coinSymbol]:string[])
 	:Promise<Result<CreatorCoinPrice,Error>>{
-		if(args[1] != undefined){
-			return getCoinPrice(args[1])
-		}else{
-			return getDefaultCoinPrice()
+		try{
+			const json=(await fetchJson(`${RALLY_API}/creator_coins/${coinSymbol}/price`)
+		   ).expect("get coin price");
+
+			const CCP=(await CreatorCoinPrice.createFromJson(json))
+				.expect("invalid data from api")
+
+			return Ok(CCP)
+		}catch(e){
+			return Err(e)
 		}
 	}
 
-	async getBalance(msg:string)
-	:Promise<Result<Balance,Error>>{
-		if(args.length != 2){
-			return Err(new WrongAmountOfArgsError())
+	@TwitchCmd(TwitchRallyCommand.getUserBalanceCmd)
+	async getUserBalance(channel:string,us:Userstate, [id]:string[]){
+		try{
+			//TODO suppoer other idType - check docs
+			const json=(await fetchJson(`${RALLY_API}/users/rally/${id}/balance`))
+				.expect("fetch json");
+
+			const balance=(await Balance.createFromJson(json))
+				.expect("creating balance");
+			return Ok(balance)
+		}catch(e){
+			return Err(e)
 		}
-
-		try { Joi.assert(args[1], Joi.string()) }
-		catch(e){return Err(e)}
-
-		return getBalance(args[1])
 	}
-	*/
 }
