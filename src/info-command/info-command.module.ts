@@ -1,6 +1,5 @@
 import { Module } from '@nestjs/common';
 import { InfoCommandService } from './info-command.service';
-import { InfoCommandController } from './info-command.controller';
 import { InfoCommand, InfoCommandSchema } from './schemas/info-command.schema';
 import { MongooseModule } from '@nestjs/mongoose';
 
@@ -10,7 +9,7 @@ import { MongooseModule } from '@nestjs/mongoose';
 			{ name: InfoCommand.name, schema: InfoCommandSchema },
 		]),
 	],
-	controllers: [InfoCommandController],
+	//controllers: [InfoCommandController],
 	providers: [
 		InfoCommandService,
 		/*
