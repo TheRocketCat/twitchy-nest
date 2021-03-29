@@ -8,12 +8,16 @@ import {
 } from '@nestjs/platform-fastify';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
+import {IToString} from "./twitch-bot/shared/interfaces/string"
+import {standardCmdHandlerSetup} from "./twitch-bot/cmd-handler"
 
+/*
 import { CmdHandler, standardCmdHandlerSetup } from './twitch-bot/cmd-handler';
 import { InfoCommandService } from './info-command/info-command.service';
 import { InfoCommandController } from './info-command/info-command.controller';
 import { TwitchInfoCommand } from './twitch-bot/info-command/info-command';
 import { ValidationPipe } from '@nestjs/common';
+*/
 
 //import {TwitchClient} from "./twitch-bot/client.service";
 dotenv.config();
@@ -93,9 +97,14 @@ async function bootstrap() {
 }
 bootstrap();
 
-function writeResultMessage(client:tmi.Client,channel:string,resMsg:Result<any,Error>):void
+function writeResultMessage(
+	client:tmi.Client,
+	channel:string,
+	resMsg:Result<string|IToString|void,Error>
+):void
 {
 	if(resMsg.err == true){
+		//TODO map errors, UserError -> UserErrors, other errors -> idk
 		client.say(channel,"command failed")
 		return
 	}else if(resMsg == Ok.EMPTY){
