@@ -9,6 +9,9 @@ const opts = {
 	channels: ['darockecat'],
 };
 
+/**
+ * @deprecated ?
+* */
 export class TSC {
 	private static _client: tmi.Client;
 
