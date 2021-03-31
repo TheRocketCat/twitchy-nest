@@ -243,5 +243,5 @@ and the old one is here:https://github.com/TheRocketCat/twitchy
 
 
 I highly suggest we go with the new one, abviously. I decided to redo it all when i discovered i had
-some extra time on my hands. Hence im not somewhat late. But holy fuck if im not proud, i really like
+some extra time on my hands. Hence im now somewhat late. But holy fuck if im not proud, i really like
 how it turned out. Yall getting alot of bang for the buck.
