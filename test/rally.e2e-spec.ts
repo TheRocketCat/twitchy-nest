@@ -12,8 +12,8 @@ import {
 describe('TwitchBot Rally Commands [e2e]', () => {
 	let cmdHandler: CmdHandler;
 	beforeAll(async ()=>{
-		const mockInfoCommand=jest.fn()
-		cmdHandler = new CmdHandler(new mockInfoCommand,new TwitchRallyCommand())
+		const mockClass=jest.fn()
+		cmdHandler = new CmdHandler(new mockClass,new TwitchRallyCommand(),new mockClass)
 	});
 	afterEach(()=>{
 		jest.clearAllMocks()

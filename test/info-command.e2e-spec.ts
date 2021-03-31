@@ -7,10 +7,11 @@ import {
 } from '@nestjs/platform-fastify';
 import { InfoCommandModule } from '../src/info-command/info-command.module';
 import { TwitchInfoCommand } from '../src/twitch-bot/info-command/info-command';
-import { CmdHandler,standardCmdHandlerSetup } from '../src/twitch-bot/cmd-handler';
+import { CmdHandler} from '../src/twitch-bot/cmd-handler';
 import {UserError} from "../src/shared/error"
 import {UnauthorizedError} from "../src/twitch-bot/auth"
 import {rootMongooseTestModule,closeInMongodConnection} from "../src/shared/testing/mongo-in-memory-db.module"
+import {InfoCommandService} from "../src/info-command/info-command.service"
 import {
 	mockCmdParams,
 	NOT_OWNER_USERSTATE,
@@ -40,7 +41,14 @@ describe('TwitchBot InfoCommand [e2e]', () => {
 		);
 		await app.init();
 
-		cmdHandler = standardCmdHandlerSetup(app)
+		const infoCmdService = app.get(InfoCommandService);
+
+		const mockClass=jest.fn()
+		cmdHandler = new CmdHandler(
+			new TwitchInfoCommand(infoCmdService),
+			new mockClass,
+			new mockClass
+		)
 	});
 	afterAll(async () => {
 		await closeInMongodConnection()
