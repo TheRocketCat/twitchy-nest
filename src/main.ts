@@ -53,7 +53,7 @@ async function bootstrap() {
 	//TODO check so tokens dont have OAUTH at beginning ?
 	const opts = {
 		options: {
-			//clientId:"zmsxkjz11ag8a7mq7hdfg3gjg2vi6d"
+			clientId:"zmsxkjz11ag8a7mq7hdfg3gjg2vi6d",
 			debug:true,messagesLogLevel:"info"
 		},
 		connection: {
