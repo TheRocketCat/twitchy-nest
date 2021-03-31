@@ -10,15 +10,9 @@ import {
 import { 
 	Model,
 	Query,
-	QueryWithHelpers
 } from 'mongoose';
 import { createMock } from '@golevelup/ts-jest';
-
-const USERSTATE = {
-	username: 'username',
-};
-const OWNED_CHANNEL = '#' + USERSTATE.username;
-const NOT_OWNED_CHANNEL = '#notownedchannel';
+import {OWNED_CHANNEL} from "../../test/utilities"
 
 interface IInfoCommand {
 	id: string;
